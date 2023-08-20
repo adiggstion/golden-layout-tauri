@@ -1,3 +1,4 @@
+import { JsonValue } from 'golden-layout';
 import { UnexpectedUndefinedError } from '../errors/internal-error';
 import { ComponentItem } from '../items/component-item';
 import { Stack } from '../items/stack';
@@ -10,7 +11,8 @@ import { numberToPixels, setElementDisplayVisibility } from '../utils/utils';
 import { HeaderButton } from './header-button';
 import { Tab } from './tab';
 import { TabsContainer } from './tabs-container';
-
+import { invoke } from '@tauri-apps/api';
+import { WebviewWindow } from '@tauri-apps/api/window'
 /**
  * This class represents a header above a Stack ContentItem.
  * @public
@@ -72,6 +74,9 @@ export class Header extends EventEmitter {
     private readonly _tabDropdownButton: HeaderButton;
     /** @internal */
     private readonly _maximiseButton: HeaderButton | undefined;
+
+
+
     // /** @internal */
     // private _activeComponentItem: ComponentItem | null = null; // only used to identify active tab
 
@@ -376,22 +381,46 @@ export class Header extends EventEmitter {
         }
     }
 
+
     /** @internal */
     private handleButtonPopoutEvent() {
-        if (this._layoutManager.layoutConfig.settings.popoutWholeStack) {
+    let tauriURL ="";
+    const activeComponentItem   =   this._getActiveComponentItemEvent();
+
+    if (activeComponentItem!=undefined) {
+            const tauriURLJson          =   activeComponentItem.toConfig().componentState;
+            const tauriURLparsed        =   JSON.parse(JSON.stringify(tauriURLJson));
+                  tauriURL              =   tauriURLparsed['tauriURL'];
+             console.log(tauriURL);
+    }else   {console.log("No Tauri URL")}
+
+
+    if (tauriURL != "") {
+
+            if (activeComponentItem!=undefined && activeComponentItem.componentType!=undefined) {
+            activeComponentItem.close();
+            console.log(activeComponentItem.title)
+            const webview = new WebviewWindow(activeComponentItem.componentType.toString(), {url:tauriURL ,title:activeComponentItem.title })
+            webview.once('tauri://created', function () {console.log("Window"+activeComponentItem.title  +"Created Sucessfully")})
+        
+            webview.once('tauri://error', function (e) {console.log(e)})}
+
+    } else {
+            if (this._layoutManager.layoutConfig.settings.popoutWholeStack) {
             if (this._popoutEvent === undefined) {
-                throw new UnexpectedUndefinedError('HHBPOE17834');
+            throw new UnexpectedUndefinedError('HHBPOE17834');
             } else {
-                this._popoutEvent();
+            this._popoutEvent();
             }
-        } else {
+            } else {
             const activeComponentItem = this._getActiveComponentItemEvent();
             if (activeComponentItem) {
-                activeComponentItem.popout();
+            activeComponentItem.popout();
             }
             // else: if the stack is empty there won't be an active item (and nothing to popout)
-        }
+            }
     }
+}
 
     /** @internal */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

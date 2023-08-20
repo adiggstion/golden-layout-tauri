@@ -58,6 +58,7 @@
   "devDependencies": {
     "@microsoft/api-documenter": "^7.12.7",
     "@microsoft/api-extractor": "^7.13.1",
+    "@tauri-apps/cli": "^1.4.0",
     "@types/karma-jasmine": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
@@ -100,5 +101,9 @@
     "last 2 Safari major versions",
     "last 2 iOS major versions",
     "Firefox ESR"
-  ]
+  ],
+  "dependencies": {
+    "@tauri-apps/api": "^1.4.0",
+    "golden-layout": "^2.6.0"
+  }
 }
