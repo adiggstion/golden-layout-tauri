@@ -400,9 +400,9 @@ export class Header extends EventEmitter {
             if (activeComponentItem!=undefined && activeComponentItem.componentType!=undefined) {
             activeComponentItem.close();
             console.log(activeComponentItem.title)
-            const webview = new WebviewWindow(activeComponentItem.componentType.toString(), {url:tauriURL ,title:activeComponentItem.title })
+            const webview = new WebviewWindow(activeComponentItem.componentType.toString(), {url:tauriURL ,title:"DAC-ECAT: "+activeComponentItem.title })
             webview.once('tauri://created', function () {console.log("Window"+activeComponentItem.title  +"Created Sucessfully")})
-        
+
             webview.once('tauri://error', function (e) {console.log(e)})}
 
     } else {
